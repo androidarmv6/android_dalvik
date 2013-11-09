@@ -50,6 +50,7 @@ static bool rewriteExecuteInlineRange(Method* method, u2* insns,
 static void rewriteReturnVoid(Method* method, u2* insns);
 static bool needsReturnBarrier(Method* method);
 
+
 /*
  * Create a table of inline substitutions.  Sets gDvm.inlineSubs.
  *
@@ -966,8 +967,6 @@ static bool rewriteInvokeObjectInit(Method* method, u2* insns)
 
         LOGVV("DexOpt: replaced Object.<init> in %s.%s",
             method->clazz->descriptor, method->name);
-    }else{
-        return false;
     }
 
     return true;

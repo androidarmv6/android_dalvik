@@ -134,7 +134,6 @@ struct DecodedInstruction {
     u4      arg[5];         /* vC/D/E/F/G in invoke or filled-new-array */
     Opcode  opcode;
     InstructionIndexType indexType;
-    void*   extraData;
 };
 
 /*
