@@ -1845,23 +1845,16 @@ static ClassObject* loadClassFromDex0(DvmDex* pDvmDex,
     }
 
     if (pHeader->instanceFieldsSize != 0) {
-        OptClassMap* optClass = getOptClassHandler(newClass);
+        int count = (int) pHeader->instanceFieldsSize;
+        u4 lastIndex = 0;
+        DexField field;
 
-        if(optClass != NULL){
-            optClass->handleIfield(newClass, classLoader, pHeader, &pEncodedData);
-        }else{
-            int count = (int) pHeader->instanceFieldsSize;
-            u4 lastIndex = 0;
-            DexField field;
-
-            newClass->ifieldCount = count;
-            newClass->ifields = (InstField*) dvmLinearAlloc(classLoader,
-                                                    count * sizeof(InstField));
-
-            for (i = 0; i < count; i++) {
-                dexReadClassDataField(&pEncodedData, &field, &lastIndex);
-                loadIFieldFromDex(newClass, &field, &newClass->ifields[i]);
-            }
+        newClass->ifieldCount = count;
+        newClass->ifields = (InstField*) dvmLinearAlloc(classLoader,
+                count * sizeof(InstField));
+        for (i = 0; i < count; i++) {
+            dexReadClassDataField(&pEncodedData, &field, &lastIndex);
+            loadIFieldFromDex(newClass, &field, &newClass->ifields[i]);
         }
         dvmLinearReadOnly(classLoader, newClass->ifields);
     }
@@ -3921,9 +3914,6 @@ static void initSFields(ClassObject* clazz)
     }
 }
 
-void dvmInitSFields(ClassObject* clazz){
-    return initSFields(clazz);
-}
 
 /*
  * Determine whether "descriptor" yields the same class object in the
@@ -4930,8 +4920,3 @@ int dvmCompareNameDescriptorAndMethod(const char* name,
 
     return dvmCompareDescriptorAndMethodProto(descriptor, method);
 }
-
-__attribute__((weak)) OptClassMap* getOptClassHandler(ClassObject*  newClass){
-    return NULL;
-}
-

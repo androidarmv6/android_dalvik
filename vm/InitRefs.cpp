@@ -104,7 +104,6 @@ static bool initClassReferences() {
         { &gDvm.exNoSuchFieldException,            "Ljava/lang/NoSuchFieldException;" },
         { &gDvm.exNoSuchMethodError,               "Ljava/lang/NoSuchMethodError;" },
         { &gDvm.exNullPointerException,            "Ljava/lang/NullPointerException;" },
-        { &gDvm.exNumberFormatException,           "Ljava/lang/NumberFormatException;" },
         { &gDvm.exOutOfMemoryError,                "Ljava/lang/OutOfMemoryError;" },
         { &gDvm.exRuntimeException,                "Ljava/lang/RuntimeException;" },
         { &gDvm.exStackOverflowError,              "Ljava/lang/StackOverflowError;" },
@@ -478,10 +477,6 @@ static bool verifyStringOffsets() {
     return ok;
 }
 
-__attribute__((weak)) bool verifyExtra(){
-    return true;
-}
-
 /* (documented in header) */
 bool dvmFindRequiredClassesAndMembers() {
     /*
@@ -496,8 +491,7 @@ bool dvmFindRequiredClassesAndMembers() {
         && initDirectMethodReferences()
         && initVirtualMethodOffsets()
         && initFinalizerReference()
-        && verifyStringOffsets()
-        && verifyExtra();
+        && verifyStringOffsets();
 }
 
 /* (documented in header) */

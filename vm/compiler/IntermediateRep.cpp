@@ -25,7 +25,6 @@ BasicBlock *dvmCompilerNewBB(BBType blockType, int blockId)
     bb->id = blockId;
     bb->predecessors = dvmCompilerAllocBitVector(blockId > 32 ? blockId : 32,
                                                  true /* expandable */);
-    bb->blockLabelLIR=NULL;
     return bb;
 }
 
@@ -118,7 +117,6 @@ void dvmCompilerInsertLIRBefore(LIR *currentLIR, LIR *newLIR)
  */
 void dvmCompilerInsertLIRAfter(LIR *currentLIR, LIR *newLIR)
 {
-    assert(currentLIR->next != NULL);
     newLIR->prev = currentLIR;
     newLIR->next = currentLIR->next;
     currentLIR->next = newLIR;

@@ -76,7 +76,6 @@ typedef struct ChainCellCounts {
         u1 count[kChainingCellLast]; /* include one more space for the gap # */
         u4 dummyForAlignment;
     } u;
-    u4 extraSize;
 } ChainCellCounts;
 
 typedef struct LIR {
@@ -176,8 +175,6 @@ typedef struct BasicBlock {
         BlockListType blockListType;    // switch and exception handling
         GrowableList blocks;
     } successorBlockList;
-
-    LIR *blockLabelLIR;
 } BasicBlock;
 
 /*
@@ -216,7 +213,6 @@ typedef struct CompilationUnit {
     int numClassPointers;
     LIR *chainCellOffsetLIR;
     GrowableList pcReconstructionList;
-    GrowableList pcReconstructionListExtended;
     int headerSize;                     // bytes before the first code ptr
     int dataOffset;                     // starting offset of literal pool
     int totalSize;                      // header + code size
@@ -232,11 +228,9 @@ typedef struct CompilationUnit {
     bool heapMemOp;                     // Mark mem ops for self verification
     bool usesLinkRegister;              // For self-verification only
     int profileCodeSize;                // Size of the profile prefix in bytes
-    GrowableList chainingListByType[kChainingCellGap];
     int numChainingCells[kChainingCellGap];
     LIR *firstChainingLIR[kChainingCellGap];
     LIR *chainingCellBottom;
-    int chainingCellExtraSize;
     struct RegisterPool *regPool;
     int optRound;                       // round number to tell an LIR's age
     jmp_buf *bailPtr;
@@ -254,7 +248,6 @@ typedef struct CompilationUnit {
 
     /* Data structure for loop analysis and optimizations */
     struct LoopAnalysis *loopAnalysis;
-    bool hasHoistedChecks;
 
     /* Map SSA names to location */
     RegLocation *regLocation;
@@ -285,12 +278,6 @@ typedef struct CompilationUnit {
     bool printSSANames;
     void *blockLabelList;
     bool quitLoopMode;                  // cold path/complex bytecode
-    void *labelList;
-    bool setCCode;                      // gen instruction that sets ccodes
-                                        // the flag must be set before calling
-                                        // codegen function and reset upon completion
-
-    void *extraData;                    // placeholder
 } CompilationUnit;
 
 #if defined(WITH_SELF_VERIFICATION)
