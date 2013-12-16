@@ -267,6 +267,7 @@ ifeq ($(dvm_arch),arm)
   ifeq ($(BOARD_USES_QCOM_HARDWARE),true)
     LOCAL_WHOLE_STATIC_LIBRARIES += libqc-dalvik
     LOCAL_SHARED_LIBRARIES += libqc-opt
+    LOCAL_CFLAGS += -DHAVE_HALFWORD_ATOMIC_MEMMOVE
   endif
 endif
 
