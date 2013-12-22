@@ -246,30 +246,6 @@ static void Dalvik_dalvik_system_VMRuntime_setTargetSdkVersion(const u4* args,
     RETURN_VOID();
 }
 
-static void Dalvik_dalvik_system_VMRuntime_registerNativeAllocation(const u4* args,
-                                                                    JValue* pResult)
-{
-  int bytes = args[1];
-  if (bytes < 0) {
-    dvmThrowRuntimeException("allocation size negative");
-  } else {
-    dvmHeapSourceRegisterNativeAllocation(bytes);
-  }
-  RETURN_VOID();
-}
-
-static void Dalvik_dalvik_system_VMRuntime_registerNativeFree(const u4* args,
-                                                              JValue* pResult)
-{
-  int bytes = args[1];
-  if (bytes < 0) {
-    dvmThrowRuntimeException("allocation size negative");
-  } else {
-    dvmHeapSourceRegisterNativeFree(bytes);
-  }
-  RETURN_VOID();
-}
-
 static DvmDex* getDvmDexFromClassPathEntry(ClassPathEntry* cpe) {
     if (cpe->kind == kCpeDex) {
         return ((RawDexFile*) cpe->ptr)->pDvmDex;
@@ -612,10 +588,6 @@ const DalvikNativeMethod dvm_dalvik_system_VMRuntime[] = {
         Dalvik_dalvik_system_VMRuntime_vmVersion },
     { "vmLibrary", "()Ljava/lang/String;",
         Dalvik_dalvik_system_VMRuntime_vmLibrary },
-    { "registerNativeAllocation", "(I)V",
-        Dalvik_dalvik_system_VMRuntime_registerNativeAllocation },
-    { "registerNativeFree", "(I)V",
-        Dalvik_dalvik_system_VMRuntime_registerNativeFree },
     { "preloadDexCaches", "()V",
         Dalvik_dalvik_system_VMRuntime_preloadDexCaches },
     { NULL, NULL, NULL },
