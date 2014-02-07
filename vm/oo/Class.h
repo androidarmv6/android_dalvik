@@ -19,8 +19,6 @@
 #ifndef DALVIK_OO_CLASS_H_
 #define DALVIK_OO_CLASS_H_
 
-#include "libdex/DexClass.h"
-
 /*
  * The classpath and bootclasspath differ in that only the latter is
  * consulted when looking for classes needed by the VM.  When searching
@@ -282,12 +280,5 @@ int dvmCompareNameDescriptorAndMethod(const char* name,
  * Returns the size of the given class object in bytes.
  */
 size_t dvmClassObjectSize(const ClassObject *clazz);
-
-typedef struct OptClassMap{
-    const char* descriptor;
-    void (*handleIfield) (ClassObject* newClass, Object* classLoader, const DexClassDataHeader* pHeader, const u1** pData);
-} OptClassMap;
-
-OptClassMap* getOptClassHandler(ClassObject*  newClass);
 
 #endif  // DALVIK_OO_CLASS_H_

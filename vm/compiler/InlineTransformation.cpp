@@ -69,7 +69,7 @@ static bool inlineGetter(CompilationUnit *cUnit,
         return false;
     }
 
-    int dfFlags = dvmGetDexOptAttributes(&getterInsn);
+    int dfFlags = dvmCompilerDataFlowAttributes[getterInsn.opcode];
 
     /* Expecting vA to be the destination register */
     if (dfFlags & (DF_UA | DF_UA_WIDE)) {
@@ -156,7 +156,7 @@ static bool inlineSetter(CompilationUnit *cUnit,
     if (!dvmCompilerCanIncludeThisInstruction(calleeMethod, &setterInsn))
         return false;
 
-    int dfFlags = dvmGetDexOptAttributes(&setterInsn);
+    int dfFlags = dvmCompilerDataFlowAttributes[setterInsn.opcode];
 
     if (dfFlags & (DF_UA | DF_UA_WIDE)) {
         setterInsn.vA = convertRegId(&invokeMIR->dalvikInsn, calleeMethod,
@@ -222,26 +222,12 @@ static bool inlineSetter(CompilationUnit *cUnit,
     return true;
 }
 
-/* skip inlining certain method */
-__attribute__((weak)) bool dvmSkipInlineThisMethod(CompilationUnit *cUnit,
-                                                const Method *calleeMethod,
-                                                MIR *invokeMIR,
-                                                BasicBlock *invokeBB,
-                                                bool isPredicted,
-                                                bool isRange)
-{
-    return false;
-}
-
 static bool tryInlineSingletonCallsite(CompilationUnit *cUnit,
                                        const Method *calleeMethod,
                                        MIR *invokeMIR,
                                        BasicBlock *invokeBB,
                                        bool isRange)
 {
-    if (dvmSkipInlineThisMethod(cUnit, calleeMethod, invokeMIR, invokeBB, false, isRange))
-        return true;
-
     /* Not a Java method */
     if (dvmIsNativeMethod(calleeMethod)) return false;
 
@@ -290,9 +276,6 @@ static bool tryInlineVirtualCallsite(CompilationUnit *cUnit,
                                      BasicBlock *invokeBB,
                                      bool isRange)
 {
-    if (dvmSkipInlineThisMethod(cUnit, calleeMethod, invokeMIR, invokeBB, true, isRange))
-        return true;
-
     /* Not a Java method */
     if (dvmIsNativeMethod(calleeMethod)) return false;
 
