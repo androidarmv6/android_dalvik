@@ -50,7 +50,6 @@ static bool rewriteExecuteInlineRange(Method* method, u2* insns,
 static void rewriteReturnVoid(Method* method, u2* insns);
 static bool needsReturnBarrier(Method* method);
 
-
 /*
  * Create a table of inline substitutions.  Sets gDvm.inlineSubs.
  *
@@ -83,6 +82,7 @@ bool dvmCreateInlineSubsTable()
             ALOGE("Unable to find method for inlining: %s.%s:%s",
                 ops[i].classDescriptor, ops[i].methodName,
                 ops[i].methodSignature);
+            free(table);
             return false;
         }
 
@@ -374,16 +374,16 @@ void dvmUpdateCodeUnit(const Method* meth, u2* ptr, u2 newVal)
  * 16-bit op, we convert the opcode from "packed" form (e.g. 0x0108) to
  * bytecode form (e.g. 0x08ff).
  */
-static inline void updateOpcode(const Method* meth, u2* ptr, Opcode opcode)
+static inline void updateOpcode(const Method* meth, u2* ptr, u2 opcode)
 {
     if (opcode >= 256) {
         /* opcode low byte becomes high byte, low byte becomes 0xff */
         assert((ptr[0] & 0xff) == 0xff);
-        dvmUpdateCodeUnit(meth, ptr, (u2) (opcode << 8) | 0x00ff);
+        dvmUpdateCodeUnit(meth, ptr, (opcode << 8) | 0x00ff);
     } else {
         /* 8-bit op, just replace the low byte */
         assert((ptr[0] & 0xff) != 0xff);
-        dvmUpdateCodeUnit(meth, ptr, (ptr[0] & 0xff00) | (u2) opcode);
+        dvmUpdateCodeUnit(meth, ptr, (ptr[0] & 0xff00) | opcode);
     }
 }
 
@@ -967,6 +967,8 @@ static bool rewriteInvokeObjectInit(Method* method, u2* insns)
 
         LOGVV("DexOpt: replaced Object.<init> in %s.%s",
             method->clazz->descriptor, method->name);
+    }else{
+        return false;
     }
 
     return true;

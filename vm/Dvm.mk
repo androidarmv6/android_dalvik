@@ -24,9 +24,14 @@
 #
 # Compiler defines.
 #
-LOCAL_CFLAGS += -fstrict-aliasing -Wstrict-aliasing=2 -fno-align-jumps
+
+LOCAL_CFLAGS += -fstrict-aliasing -Wstrict-aliasing=2
 LOCAL_CFLAGS += -Wall -Wextra -Wno-unused-parameter
 LOCAL_CFLAGS += -DARCH_VARIANT=\"$(dvm_arch_variant)\"
+
+ifneq ($(strip $(LOCAL_CLANG)),true)
+LOCAL_CFLAGS += -fno-align-jumps
+endif
 
 #
 # Optional features.  These may impact the size or performance of the VM.
@@ -222,7 +227,6 @@ ifeq ($(WITH_JIT),true)
 endif
 
 LOCAL_C_INCLUDES += \
-	$(JNI_H_INCLUDE) \
 	dalvik \
 	dalvik/vm \
 	external/zlib \
@@ -235,6 +239,7 @@ ifeq ($(dvm_arch),arm)
   #LOCAL_CFLAGS += -march=armv7-a -mfloat-abi=softfp -mfpu=vfp
   LOCAL_CFLAGS += -Werror
   MTERP_ARCH_KNOWN := true
+
   # Select architecture-specific sources (armv5te, armv7-a, etc.)
   LOCAL_SRC_FILES += \
 		arch/arm/CallOldABI.S \
@@ -244,6 +249,9 @@ ifeq ($(dvm_arch),arm)
 		mterp/out/InterpAsm-$(dvm_arch_variant).S
 
   ifeq ($(WITH_JIT),true)
+    # Debuggerd support
+    LOCAL_SRC_FILES += DalvikCrashDump.cpp
+
     LOCAL_SRC_FILES += \
 		compiler/codegen/RallocUtil.cpp \
 		compiler/codegen/arm/$(dvm_arch_variant)/Codegen.cpp \
@@ -254,6 +262,18 @@ ifeq ($(dvm_arch),arm)
 		compiler/codegen/arm/GlobalOptimizations.cpp \
 		compiler/codegen/arm/ArmRallocUtil.cpp \
 		compiler/template/out/CompilerTemplateAsm-$(dvm_arch_variant).S
+  endif
+  ifeq ($(call is-vendor-board-platform,QCOM),true)
+    ifeq ($(WITH_QC_PERF),true)
+      LOCAL_WHOLE_STATIC_LIBRARIES += libqc-dalvik
+      LOCAL_SHARED_LIBRARIES += libqc-opt
+      LOCAL_CFLAGS += -DWITH_QC_PERF
+    endif
+    LOCAL_CFLAGS += -DHAVE_HALFWORD_ATOMIC_MEMMOVE
+  else
+  ifeq ($(TARGET_CPU_VARIANT),cortex-a15)
+    LOCAL_CFLAGS += -DHAVE_HALFWORD_ATOMIC_MEMMOVE
+  endif
   endif
 endif
 

@@ -1746,6 +1746,9 @@ static ClassObject* loadClassFromDex0(DvmDex* pDvmDex,
      * Make sure the aren't any "bonus" flags set, since we use them for
      * runtime state.
      */
+    /* bits we can reasonably expect to see set in a DEX access flags field */
+    const uint32_t EXPECTED_FILE_FLAGS = (ACC_CLASS_MASK | CLASS_ISPREVERIFIED |
+                                          CLASS_ISOPTIMIZED);
     if ((pClassDef->accessFlags & ~EXPECTED_FILE_FLAGS) != 0) {
         ALOGW("Invalid file flags in class %s: %04x",
             descriptor, pClassDef->accessFlags);
@@ -1842,16 +1845,23 @@ static ClassObject* loadClassFromDex0(DvmDex* pDvmDex,
     }
 
     if (pHeader->instanceFieldsSize != 0) {
-        int count = (int) pHeader->instanceFieldsSize;
-        u4 lastIndex = 0;
-        DexField field;
+        OptClassMap* optClass = getOptClassHandler(newClass);
 
-        newClass->ifieldCount = count;
-        newClass->ifields = (InstField*) dvmLinearAlloc(classLoader,
-                count * sizeof(InstField));
-        for (i = 0; i < count; i++) {
-            dexReadClassDataField(&pEncodedData, &field, &lastIndex);
-            loadIFieldFromDex(newClass, &field, &newClass->ifields[i]);
+        if(optClass != NULL){
+            optClass->handleIfield(newClass, classLoader, pHeader, &pEncodedData);
+        }else{
+            int count = (int) pHeader->instanceFieldsSize;
+            u4 lastIndex = 0;
+            DexField field;
+
+            newClass->ifieldCount = count;
+            newClass->ifields = (InstField*) dvmLinearAlloc(classLoader,
+                                                    count * sizeof(InstField));
+
+            for (i = 0; i < count; i++) {
+                dexReadClassDataField(&pEncodedData, &field, &lastIndex);
+                loadIFieldFromDex(newClass, &field, &newClass->ifields[i]);
+            }
         }
         dvmLinearReadOnly(classLoader, newClass->ifields);
     }
@@ -3911,6 +3921,9 @@ static void initSFields(ClassObject* clazz)
     }
 }
 
+void dvmInitSFields(ClassObject* clazz){
+    return initSFields(clazz);
+}
 
 /*
  * Determine whether "descriptor" yields the same class object in the
@@ -4917,3 +4930,8 @@ int dvmCompareNameDescriptorAndMethod(const char* name,
 
     return dvmCompareDescriptorAndMethodProto(descriptor, method);
 }
+
+__attribute__((weak)) OptClassMap* getOptClassHandler(ClassObject*  newClass){
+    return NULL;
+}
+
