@@ -1027,18 +1027,22 @@ static AssemblerStatus assembleInstructions(CompilationUnit *cUnit,
             intptr_t target = targetLIR->generic.offset;
             int delta = target - pc;
             if ((lir->opcode == kThumbBCond) && (delta > 254 || delta < -256)) {
+#if defined(_ARMV7_A) || defined(_ARMV7_A_NEON)
                 if (delta <= 1048574 && delta >= -1048576) {
                     /* convert T1 branch to T3 */
                     lir->opcode = kThumb2BCond;
                     return kRetryAll;
                 } else {
+#endif
                     if (cUnit->printMe) {
                         ALOGD("kThumbBCond@%x: delta=%d", lir->generic.offset,
                             delta);
                         dvmCompilerCodegenDump(cUnit);
                     }
                     return kRetryHalve;
+#if defined(_ARMV7_A) || defined(_ARMV7_A_NEON)
                 }
+#endif
             }
             lir->operands[0] = delta >> 1;
         } else if (lir->opcode == kThumbBUncond) {
