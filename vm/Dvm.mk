@@ -261,7 +261,7 @@ ifeq ($(dvm_arch),arm)
   endif
 
   ifeq ($(call is-vendor-board-platform,QCOM),true)
-    ifeq ($(WITH_QC_PERF),true)
+    ifeq ($(TARGET_HAVE_QC_PERF),true)
       LOCAL_WHOLE_STATIC_LIBRARIES += libqc-dalvik
       LOCAL_SHARED_LIBRARIES += libqc-opt
       LOCAL_CFLAGS += -DWITH_QC_PERF
