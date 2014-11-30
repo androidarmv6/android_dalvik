@@ -16429,7 +16429,7 @@ common_updateProfile:
     GET_INST_OPCODE(ip)
     subs    r1,r1,#1           @ decrement counter
     strb    r1,[r0,r3,lsr #(32 - JIT_PROF_SIZE_LOG_2)] @ and store it
-    GOTO_OPCODE_IFNE(ip)       @ if not threshold, fallthrough otherwise */
+    GOTO_OPCODE_IFNE(ip)       @ if not threshold, fallthrough otherwise
 
     /* Looks good, reset the counter */
     ldr     r1, [rSELF, #offThread_jitThreshold]
@@ -16758,7 +16758,9 @@ dalvik_mterp:
     cmp     lr, #0                      @ any special SubModes active?
     bne     11f                         @ go handle them if so
     ldr     ip, [r2, #offMethod_nativeFunc] @ pc<- methodToCall->nativeFunc
+    mov     r9, r10
     blx     ip
+    mov     r10, r9
 7:
 
     @ native return; r10=newSaveArea
