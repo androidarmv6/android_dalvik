@@ -16300,7 +16300,9 @@ dalvik_mterp:
     cmp     lr, #0                      @ any special SubModes active?
     bne     11f                         @ go handle them if so
     ldr     ip, [r2, #offMethod_nativeFunc] @ pc<- methodToCall->nativeFunc
+    mov     r9, r10
     blx     ip
+    mov     r10, r9
 7:
 
     @ native return; r10=newSaveArea

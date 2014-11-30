@@ -254,6 +254,7 @@ DBG strcs   ip, [r8]                    @ DEBUG DEBUG
     ldmia   r9, {r2-r3}                 @ r2/r3<- argv[0]/argv[1]
 
     ldr     ip, [fp, #8+FP_ADJ]         @ ip<- func
+    mov     r7, fp
 #ifdef __ARM_HAVE_BLX
     blx     ip                          @ call func
 #else
@@ -272,6 +273,7 @@ DBG strcs   ip, [r8]                    @ DEBUG DEBUG
     @ and double-word values occupy different ranges; simple comparison
     @ allows us to choose between str and stm.  Probably not worthwhile.
     @
+    mov     fp, r7
     cmp     r6, #0                      @ DALVIK_JNI_RETURN_VOID?
     ldrne   ip, [fp, #12+FP_ADJ]        @ pReturn
     sub     sp, fp, #FP_STACK_OFFSET    @ restore sp to post-reg-save offset
