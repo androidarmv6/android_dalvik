@@ -447,6 +447,10 @@ ArmEncodingMap EncodingMap[kArmLast] = {
                  kFmtDfp, 22, 12, kFmtDfp, 7, 16, kFmtDfp, 5, 0,
                  kFmtUnused, -1, -1, IS_TERTIARY_OP | REG_DEF0_USE12,
                  "vdivd", "!0S, !1S, !2S", 2),
+    ENCODING_MAP(kThumb2VmlaF64,     0xee000b00,
+                 kFmtDfp, 22, 12, kFmtDfp, 7, 16, kFmtDfp, 5, 0,
+                 kFmtUnused, -1, -1, IS_TERTIARY_OP | REG_DEF0 | REG_USE012,
+                 "vmla", "!0S, !1S, !2S", 2),
     ENCODING_MAP(kThumb2VcvtIF,       0xeeb80ac0,
                  kFmtSfp, 22, 12, kFmtSfp, 5, 0, kFmtUnused, -1, -1,
                  kFmtUnused, -1, -1, IS_BINARY_OP | REG_DEF0_USE1,
@@ -471,6 +475,14 @@ ArmEncodingMap EncodingMap[kArmLast] = {
                  kFmtSfp, 22, 12, kFmtDfp, 5, 0, kFmtUnused, -1, -1,
                  kFmtUnused, -1, -1, IS_BINARY_OP | REG_DEF0_USE1,
                  "vcvt.f32.f64 ", "!0s, !1S", 2),
+    ENCODING_MAP(kThumb2VcvtF64S32,   0xeeb80bc0,
+                 kFmtDfp, 22, 12, kFmtSfp, 5, 0, kFmtUnused, -1, -1,
+                 kFmtUnused, -1, -1, IS_BINARY_OP | REG_DEF0_USE1,
+                 "vcvt.f64.s32 ", "!0S, !1s", 2),
+    ENCODING_MAP(kThumb2VcvtF64U32,   0xeeb80b40,
+                 kFmtDfp, 22, 12, kFmtSfp, 5, 0, kFmtUnused, -1, -1,
+                 kFmtUnused, -1, -1, IS_BINARY_OP | REG_DEF0_USE1,
+                 "vcvt.f64.u32 ", "!0S, !1s", 2),
     ENCODING_MAP(kThumb2Vsqrts,       0xeeb10ac0,
                  kFmtSfp, 22, 12, kFmtSfp, 5, 0, kFmtUnused, -1, -1,
                  kFmtUnused, -1, -1, IS_BINARY_OP | REG_DEF0_USE1,
@@ -1545,7 +1557,7 @@ void dvmCompilerAssembleLIR(CompilationUnit *cUnit, JitTranslationInfo *info)
 
     /* Flush dcache and invalidate the icache to maintain coherence */
     dvmCompilerCacheFlush((long)cUnit->baseAddr,
-                          (long)((char *) cUnit->baseAddr + offset), 0);
+                          (long)((char *) cUnit->baseAddr + offset));
     UPDATE_CODE_CACHE_PATCHES();
 
     PROTECT_CODE_CACHE(cUnit->baseAddr, offset);
@@ -1645,7 +1657,7 @@ void* dvmJitChain(void* tgtAddr, u4* branchAddr)
         UNPROTECT_CODE_CACHE(branchAddr, sizeof(*branchAddr));
 
         *branchAddr = newInst;
-        dvmCompilerCacheFlush((long)branchAddr, (long)branchAddr + 4, 0);
+        dvmCompilerCacheFlush((long)branchAddr, (long)branchAddr + 4);
         UPDATE_CODE_CACHE_PATCHES();
 
         PROTECT_CODE_CACHE(branchAddr, sizeof(*branchAddr));
@@ -1685,7 +1697,7 @@ static void inlineCachePatchEnqueue(PredictedChainingCell *cellAddr,
          */
         android_atomic_release_store((int32_t)newContent->clazz,
             (volatile int32_t *)(void *)&cellAddr->clazz);
-        dvmCompilerCacheFlush((intptr_t) cellAddr, (intptr_t) (cellAddr+1), 0);
+        dvmCompilerCacheFlush((intptr_t) cellAddr, (intptr_t) (cellAddr+1));
         UPDATE_CODE_CACHE_PATCHES();
 
         PROTECT_CODE_CACHE(cellAddr, sizeof(*cellAddr));
@@ -1885,7 +1897,7 @@ void dvmCompilerPatchInlineCache(void)
     }
 
     /* Then synchronize the I/D cache */
-    dvmCompilerCacheFlush((long) minAddr, (long) (maxAddr+1), 0);
+    dvmCompilerCacheFlush((long) minAddr, (long) (maxAddr+1));
     UPDATE_CODE_CACHE_PATCHES();
 
     PROTECT_CODE_CACHE(gDvmJit.codeCache, gDvmJit.codeCacheByteUsed);
@@ -1993,7 +2005,7 @@ void dvmJitUnchainAll()
                     highAddress = lastAddress;
             }
         }
-        dvmCompilerCacheFlush((long)lowAddress, (long)highAddress, 0);
+        dvmCompilerCacheFlush((long)lowAddress, (long)highAddress);
         UPDATE_CODE_CACHE_PATCHES();
 
         PROTECT_CODE_CACHE(gDvmJit.codeCache, gDvmJit.codeCacheByteUsed);

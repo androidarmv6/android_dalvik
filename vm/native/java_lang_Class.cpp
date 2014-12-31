@@ -562,36 +562,6 @@ static void Dalvik_java_lang_Class_newInstance(const u4* args, JValue* pResult)
 }
 
 /*
- * private Object[] getSignatureAnnotation()
- *
- * Returns the signature annotation array.
- */
-static void Dalvik_java_lang_Class_getSignatureAnnotation(const u4* args,
-    JValue* pResult)
-{
-    ClassObject* clazz = (ClassObject*) args[0];
-    ArrayObject* arr = dvmGetClassSignatureAnnotation(clazz);
-
-    dvmReleaseTrackedAlloc((Object*) arr, NULL);
-    RETURN_PTR(arr);
-}
-
-/*
- * public Class getDeclaringClass()
- *
- * Get the class that encloses this class (if any).
- */
-static void Dalvik_java_lang_Class_getDeclaringClass(const u4* args,
-    JValue* pResult)
-{
-    ClassObject* clazz = (ClassObject*) args[0];
-
-    ClassObject* enclosing = dvmGetDeclaringClass(clazz);
-    dvmReleaseTrackedAlloc((Object*) enclosing, NULL);
-    RETURN_PTR(enclosing);
-}
-
-/*
  * public Class getEnclosingClass()
  *
  * Get the class that encloses this class (if any).
@@ -648,32 +618,6 @@ static void Dalvik_java_lang_Class_getEnclosingMethod(const u4* args,
     RETURN_PTR(NULL);
 }
 
-#if 0
-static void Dalvik_java_lang_Class_getGenericInterfaces(const u4* args,
-    JValue* pResult)
-{
-    dvmThrowUnsupportedOperationException("native method not implemented");
-
-    RETURN_PTR(NULL);
-}
-
-static void Dalvik_java_lang_Class_getGenericSuperclass(const u4* args,
-    JValue* pResult)
-{
-    dvmThrowUnsupportedOperationException("native method not implemented");
-
-    RETURN_PTR(NULL);
-}
-
-static void Dalvik_java_lang_Class_getTypeParameters(const u4* args,
-    JValue* pResult)
-{
-    dvmThrowUnsupportedOperationException("native method not implemented");
-
-    RETURN_PTR(NULL);
-}
-#endif
-
 /*
  * public boolean isAnonymousClass()
  *
@@ -696,6 +640,27 @@ static void Dalvik_java_lang_Class_isAnonymousClass(const u4* args,
 
     dvmReleaseTrackedAlloc((Object*) className, NULL);
     RETURN_BOOLEAN(className == NULL);
+}
+
+/*
+ * public Class getDeclaringClass()
+ *
+ * Get the class that encloses this class (if any).
+ */
+static void Dalvik_java_lang_Class_getDeclaringClass(const u4* args,
+    JValue* pResult)
+{
+    JValue isAnonymousClass;
+    Dalvik_java_lang_Class_isAnonymousClass(args, &isAnonymousClass);
+    if (isAnonymousClass.z) {
+        RETURN_PTR(NULL);
+    }
+
+    ClassObject* clazz = (ClassObject*) args[0];
+
+    ClassObject* enclosing = dvmGetDeclaringClass(clazz);
+    dvmReleaseTrackedAlloc((Object*) enclosing, NULL);
+    RETURN_PTR(enclosing);
 }
 
 /*
@@ -813,8 +778,6 @@ const DalvikNativeMethod dvm_java_lang_Class[] = {
         Dalvik_java_lang_Class_getClassLoader },
     { "getComponentType",       "()Ljava/lang/Class;",
         Dalvik_java_lang_Class_getComponentType },
-    { "getSignatureAnnotation",  "()[Ljava/lang/Object;",
-        Dalvik_java_lang_Class_getSignatureAnnotation },
     { "getDeclaredClasses",     "(Ljava/lang/Class;Z)[Ljava/lang/Class;",
         Dalvik_java_lang_Class_getDeclaredClasses },
     { "getDeclaredConstructors", "(Ljava/lang/Class;Z)[Ljava/lang/reflect/Constructor;",

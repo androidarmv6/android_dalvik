@@ -227,7 +227,13 @@ static void Dalvik_dalvik_system_VMRuntime_vmLibrary(const u4* args,
     returnCString(pResult, "libdvm.so");
 }
 
-static void Dalvik_dalvik_system_VMRuntime_setTargetSdkVersion(const u4* args,
+static void Dalvik_dalvik_system_VMRuntime_isCheckJniEnabled(const u4* args, JValue* pResult)
+{
+    RETURN_BOOLEAN(gDvmJni.useCheckJni);
+}
+
+static void Dalvik_dalvik_system_VMRuntime_setTargetSdkVersionNative(
+    const u4* args,
     JValue* pResult)
 {
     // This is the target SDK version of the app we're about to run.
@@ -269,6 +275,13 @@ static void Dalvik_dalvik_system_VMRuntime_registerNativeFree(const u4* args,
   }
   RETURN_VOID();
 }
+
+static void Dalvik_dalvik_system_VMRuntime_updateProcessState(const u4* args,
+                                                              JValue* pResult)
+{
+  RETURN_VOID();
+}
+
 
 static DvmDex* getDvmDexFromClassPathEntry(ClassPathEntry* cpe) {
     if (cpe->kind == kCpeDex) {
@@ -604,18 +617,22 @@ const DalvikNativeMethod dvm_dalvik_system_VMRuntime[] = {
         Dalvik_dalvik_system_VMRuntime_newNonMovableArray },
     { "properties", "()[Ljava/lang/String;",
         Dalvik_dalvik_system_VMRuntime_properties },
-    { "setTargetSdkVersion", "(I)V",
-        Dalvik_dalvik_system_VMRuntime_setTargetSdkVersion },
+    { "setTargetSdkVersionNative", "(I)V",
+        Dalvik_dalvik_system_VMRuntime_setTargetSdkVersionNative },
     { "startJitCompilation", "()V",
         Dalvik_dalvik_system_VMRuntime_startJitCompilation },
     { "vmVersion", "()Ljava/lang/String;",
         Dalvik_dalvik_system_VMRuntime_vmVersion },
     { "vmLibrary", "()Ljava/lang/String;",
         Dalvik_dalvik_system_VMRuntime_vmLibrary },
+    { "isCheckJniEnabled", "()Z",
+        Dalvik_dalvik_system_VMRuntime_isCheckJniEnabled },
     { "registerNativeAllocation", "(I)V",
         Dalvik_dalvik_system_VMRuntime_registerNativeAllocation },
     { "registerNativeFree", "(I)V",
         Dalvik_dalvik_system_VMRuntime_registerNativeFree },
+    { "updateProcessState", "(I)V",
+        Dalvik_dalvik_system_VMRuntime_updateProcessState },
     { "preloadDexCaches", "()V",
         Dalvik_dalvik_system_VMRuntime_preloadDexCaches },
     { NULL, NULL, NULL },

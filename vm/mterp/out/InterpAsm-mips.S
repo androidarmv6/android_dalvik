@@ -7,8 +7,6 @@
 /* File: mips/header.S */
 #include "../common/asm-constants.h"
 #include "../common/mips-defines.h"
-#include <asm/regdef.h>
-#include <asm/fpregdef.h>
 
 #ifdef __mips_hard_float
 #define HARD_FLOAT
@@ -571,8 +569,8 @@ dalvik_inst:
     EAS2(a2, rFP, a2)                      #  a2 <- &fp[A]
     LOAD64(a0, a1, a3)                     #  a0/a1 <- fp[B]
     FETCH_ADVANCE_INST(1)                  #  advance rPC, load rINST
-    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     STORE64(a0, a1, a2)                    #  fp[A] <- a0/a1
+    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     GOTO_OPCODE(t0)                        #  jump to next instruction
 
 
@@ -588,8 +586,8 @@ dalvik_inst:
     EAS2(a2, rFP, a2)                      #  a2 <- &fp[AA]
     LOAD64(a0, a1, a3)                     #  a0/a1 <- fp[BBBB]
     FETCH_ADVANCE_INST(2)                  #  advance rPC, load rINST
-    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     STORE64(a0, a1, a2)                    #  fp[AA] <- a0/a1
+    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     GOTO_OPCODE(t0)                        #  jump to next instruction
 
 
@@ -605,8 +603,8 @@ dalvik_inst:
     EAS2(a2, rFP, a2)                      #  a2 <- &fp[AAAA]
     LOAD64(a0, a1, a3)                     #  a0/a1 <- fp[BBBB]
     FETCH_ADVANCE_INST(3)                  #  advance rPC, load rINST
-    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     STORE64(a0, a1, a2)                    #  fp[AAAA] <- a0/a1
+    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     GOTO_OPCODE(t0)                        #  jump to next instruction
 
 
@@ -681,8 +679,8 @@ dalvik_inst:
     EAS2(a2, rFP, a2)                      #  a2 <- &fp[AA]
     LOAD64(a0, a1, a3)                     #  a0/a1 <- retval.j
     FETCH_ADVANCE_INST(1)                  #  advance rPC, load rINST
-    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     STORE64(a0, a1, a2)                    #  fp[AA] <- a0/a1
+    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     GOTO_OPCODE(t0)                        #  jump to next instruction
 
 
@@ -1235,8 +1233,8 @@ dalvik_inst:
     # failed?
     beqz      v0, common_exceptionThrown   #  yes, handle the exception
     FETCH_ADVANCE_INST(2)                  #  advance rPC, load rINST
-    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     SET_VREG(v0, a2)                       #  vA <- v0
+    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     GOTO_OPCODE(t0)                        #  jump to next instruction
 
 /* ------------------------------ */
@@ -2627,8 +2625,8 @@ dalvik_inst:
     bnez      rBIX, .LOP_APUT_OBJECT_checks     #  yes, skip type checks
 .LOP_APUT_OBJECT_finish:
     FETCH_ADVANCE_INST(2)                  #  advance rPC, load rINST
-    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     sw        rBIX, offArrayObject_contents(rOBJ) #  vBB[vCC] <- vAA
+    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     GOTO_OPCODE(t0)                        #  jump to next instruction
 
 
@@ -8856,8 +8854,8 @@ dalvik_inst:
     addu      t0, a3, a1 #
     lw        a0, 0(t0)                    #  a0 <- obj.field (always 32 bits)
     FETCH_ADVANCE_INST(2)                  #  advance rPC, load rINST
-    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     SET_VREG(a0, a2)                       #  fp[A] <- a0
+    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     GOTO_OPCODE(t0)                        #  jump to next instruction
 
 
@@ -8897,8 +8895,8 @@ dalvik_inst:
     addu      t0, a3, a1 #
     lw        a0, 0(t0)                    #  a0 <- obj.field (always 32 bits)
     FETCH_ADVANCE_INST(2)                  #  advance rPC, load rINST
-    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     SET_VREG(a0, a2)                       #  fp[A] <- a0
+    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     GOTO_OPCODE(t0)                        #  jump to next instruction
 
 
@@ -9283,8 +9281,8 @@ dvmAsmSisterStart:
 
 .LOP_NEW_INSTANCE_continue:
     FETCH_ADVANCE_INST(2)                  #  advance rPC, load rINST
-    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     SET_VREG(v0, a3)                       #  vAA <- v0
+    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     GOTO_OPCODE(t0)                        #  jump to next instruction
 
 #if defined(WITH_JIT)
@@ -9303,8 +9301,8 @@ dvmAsmSisterStart:
     move      a1, rPC
     JAL(dvmJitEndTraceSelect)              #  (self, pc)
     FETCH_ADVANCE_INST(2)                  #  advance rPC, load rINST
-    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     SET_VREG(rOBJ, rBIX)                   #  vAA <- new object
+    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     GOTO_OPCODE(t0)                        #  jump to next instruction
 #endif
 
@@ -9666,8 +9664,8 @@ OP_CMPG_DOUBLE_finish:
          # noop                               #  acquiring load
     GET_OPA4(a2)                           #  a2 <- A+
     FETCH_ADVANCE_INST(2)                  #  advance rPC, load rINST
-    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     SET_VREG(a0, a2)                       #  fp[A] <- a0
+    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     GOTO_OPCODE(t0)                        #  jump to next instruction
 
 
@@ -9712,8 +9710,8 @@ OP_CMPG_DOUBLE_finish:
          # noop                               #  acquiring load
     GET_OPA4(a2)                           #  a2 <- A+
     FETCH_ADVANCE_INST(2)                  #  advance rPC, load rINST
-    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     SET_VREG(a0, a2)                       #  fp[A] <- a0
+    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     GOTO_OPCODE(t0)                        #  jump to next instruction
 
 
@@ -9734,8 +9732,8 @@ OP_CMPG_DOUBLE_finish:
          # noop                               #  acquiring load
     GET_OPA4(a2)                           #  a2 <- A+
     FETCH_ADVANCE_INST(2)                  #  advance rPC, load rINST
-    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     SET_VREG(a0, a2)                       #  fp[A] <- a0
+    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     GOTO_OPCODE(t0)                        #  jump to next instruction
 
 
@@ -9756,8 +9754,8 @@ OP_CMPG_DOUBLE_finish:
          # noop                               #  acquiring load
     GET_OPA4(a2)                           #  a2 <- A+
     FETCH_ADVANCE_INST(2)                  #  advance rPC, load rINST
-    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     SET_VREG(a0, a2)                       #  fp[A] <- a0
+    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     GOTO_OPCODE(t0)                        #  jump to next instruction
 
 
@@ -9778,8 +9776,8 @@ OP_CMPG_DOUBLE_finish:
          # noop                               #  acquiring load
     GET_OPA4(a2)                           #  a2 <- A+
     FETCH_ADVANCE_INST(2)                  #  advance rPC, load rINST
-    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     SET_VREG(a0, a2)                       #  fp[A] <- a0
+    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     GOTO_OPCODE(t0)                        #  jump to next instruction
 
 
@@ -9800,8 +9798,8 @@ OP_CMPG_DOUBLE_finish:
          # noop                               #  acquiring load
     GET_OPA4(a2)                           #  a2 <- A+
     FETCH_ADVANCE_INST(2)                  #  advance rPC, load rINST
-    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     SET_VREG(a0, a2)                       #  fp[A] <- a0
+    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     GOTO_OPCODE(t0)                        #  jump to next instruction
 
 
@@ -9820,11 +9818,11 @@ OP_CMPG_DOUBLE_finish:
     # check object for null
     beqz      rOBJ, common_errNullObject   #  object was null
     FETCH_ADVANCE_INST(2)                  #  advance rPC, load rINST
-    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     addu      rOBJ, rOBJ, a3               #  form address
         #  noop                            #  releasing store
     sw a0, (rOBJ)                      #  obj.field (8/16/32 bits) <- a0
         #  noop
+    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     GOTO_OPCODE(t0)                        #  jump to next instruction
 
 
@@ -9870,11 +9868,11 @@ OP_CMPG_DOUBLE_finish:
     # check object for null
     beqz      rOBJ, common_errNullObject   #  object was null
     FETCH_ADVANCE_INST(2)                  #  advance rPC, load rINST
-    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     addu      t2, rOBJ, a3                 #  form address
         #  noop                            #  releasing store
     sw a0, (t2)                        #  obj.field (32 bits) <- a0
         #  noop
+    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     beqz      a0, 1f                       #  stored a null reference?
     srl       t1, rOBJ, GC_CARD_SHIFT
     addu      t2, a2, t1
@@ -9898,11 +9896,11 @@ OP_CMPG_DOUBLE_finish:
     # check object for null
     beqz      rOBJ, common_errNullObject   #  object was null
     FETCH_ADVANCE_INST(2)                  #  advance rPC, load rINST
-    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     addu      rOBJ, rOBJ, a3               #  form address
         #  noop                            #  releasing store
     sw a0, (rOBJ)                      #  obj.field (8/16/32 bits) <- a0
         #  noop
+    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     GOTO_OPCODE(t0)                        #  jump to next instruction
 
 
@@ -9921,11 +9919,11 @@ OP_CMPG_DOUBLE_finish:
     # check object for null
     beqz      rOBJ, common_errNullObject   #  object was null
     FETCH_ADVANCE_INST(2)                  #  advance rPC, load rINST
-    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     addu      rOBJ, rOBJ, a3               #  form address
         #  noop                            #  releasing store
     sw a0, (rOBJ)                      #  obj.field (8/16/32 bits) <- a0
         #  noop
+    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     GOTO_OPCODE(t0)                        #  jump to next instruction
 
 
@@ -9944,11 +9942,11 @@ OP_CMPG_DOUBLE_finish:
     # check object for null
     beqz      rOBJ, common_errNullObject   #  object was null
     FETCH_ADVANCE_INST(2)                  #  advance rPC, load rINST
-    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     addu      rOBJ, rOBJ, a3               #  form address
         #  noop                            #  releasing store
     sw a0, (rOBJ)                      #  obj.field (8/16/32 bits) <- a0
         #  noop
+    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     GOTO_OPCODE(t0)                        #  jump to next instruction
 
 
@@ -9967,11 +9965,11 @@ OP_CMPG_DOUBLE_finish:
     # check object for null
     beqz      rOBJ, common_errNullObject   #  object was null
     FETCH_ADVANCE_INST(2)                  #  advance rPC, load rINST
-    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     addu      rOBJ, rOBJ, a3               #  form address
         #  noop                            #  releasing store
     sw a0, (rOBJ)                      #  obj.field (8/16/32 bits) <- a0
         #  noop
+    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     GOTO_OPCODE(t0)                        #  jump to next instruction
 
 
@@ -10619,8 +10617,8 @@ d2l_doconv:
     SMP_DMB                               #  acquiring load
     GET_OPA4(a2)                           #  a2 <- A+
     FETCH_ADVANCE_INST(2)                  #  advance rPC, load rINST
-    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     SET_VREG(a0, a2)                       #  fp[A] <- a0
+    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     GOTO_OPCODE(t0)                        #  jump to next instruction
 
 
@@ -10639,11 +10637,11 @@ d2l_doconv:
     # check object for null
     beqz      rOBJ, common_errNullObject   #  object was null
     FETCH_ADVANCE_INST(2)                  #  advance rPC, load rINST
-    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     addu      rOBJ, rOBJ, a3               #  form address
     SMP_DMB_ST                            #  releasing store
     sw a0, (rOBJ)                      #  obj.field (8/16/32 bits) <- a0
     SMP_DMB
+    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     GOTO_OPCODE(t0)                        #  jump to next instruction
 
 
@@ -10687,8 +10685,8 @@ d2l_doconv:
     SMP_DMB                               #  acquiring load
     GET_OPA4(a2)                           #  a2 <- A+
     FETCH_ADVANCE_INST(2)                  #  advance rPC, load rINST
-    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     SET_VREG(a0, a2)                       #  fp[A] <- a0
+    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     GOTO_OPCODE(t0)                        #  jump to next instruction
 
 
@@ -10954,11 +10952,11 @@ d2l_doconv:
     # check object for null
     beqz      rOBJ, common_errNullObject   #  object was null
     FETCH_ADVANCE_INST(2)                  #  advance rPC, load rINST
-    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     addu      t2, rOBJ, a3                 #  form address
     SMP_DMB_ST                            #  releasing store
     sw a0, (t2)                        #  obj.field (32 bits) <- a0
     SMP_DMB
+    GET_INST_OPCODE(t0)                    #  extract opcode from rINST
     beqz      a0, 1f                       #  stored a null reference?
     srl       t1, rOBJ, GC_CARD_SHIFT
     addu      t2, a2, t1

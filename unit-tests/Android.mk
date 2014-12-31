@@ -17,7 +17,6 @@
 LOCAL_PATH := $(call my-dir)
 
 test_module = dalvik-vm-unit-tests
-test_tags = eng tests
 
 test_src_files = \
     dvmHumanReadableDescriptor_test.cpp \
@@ -32,9 +31,9 @@ include $(CLEAR_VARS)
 LOCAL_CFLAGS += -DANDROID_SMP=1
 LOCAL_C_INCLUDES += $(test_c_includes)
 LOCAL_MODULE := $(test_module)
-LOCAL_MODULE_TAGS := $(test_tags)
 LOCAL_SRC_FILES := $(test_src_files)
 LOCAL_SHARED_LIBRARIES += libcutils libdvm
+LOCAL_32_BIT_ONLY := true
 include $(BUILD_NATIVE_TEST)
 
 # Build for the host.
@@ -43,7 +42,6 @@ include $(BUILD_NATIVE_TEST)
 #include $(CLEAR_VARS)
 #LOCAL_C_INCLUDES += $(test_c_includes)
 #LOCAL_MODULE := $(test_module)
-#LOCAL_MODULE_TAGS := $(test_tags)
 #LOCAL_SRC_FILES := $(test_src_files)
 #LOCAL_SHARED_LIBRARIES += libdvm libcrypto libssl libicuuc libicui18n
 #LOCAL_WHOLE_STATIC_LIBRARIES += libcutils liblog libdvm

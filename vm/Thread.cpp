@@ -936,7 +936,7 @@ static bool prepareThread(Thread* thread)
 
     memset(&thread->jniMonitorRefTable, 0, sizeof(thread->jniMonitorRefTable));
 
-    pthread_cond_init(&thread->waitCond, NULL);
+    dvmInitCondForTimedWait(&thread->waitCond);
     dvmInitMutex(&thread->waitMutex);
 
     /* Initialize safepoint callback mechanism */

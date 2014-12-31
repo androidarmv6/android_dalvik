@@ -19,8 +19,6 @@
 #include <errno.h>
 #include <cutils/ashmem.h>
 
-#define SIZE_MAX UINT_MAX  // TODO: get SIZE_MAX from stdint.h
-
 #include "Dalvik.h"
 #include "alloc/DlMalloc.h"
 #include "alloc/Heap.h"
@@ -560,7 +558,7 @@ static void *gcDaemonThread(void* arg)
 static bool gcDaemonStartup()
 {
     dvmInitMutex(&gHs->gcThreadMutex);
-    pthread_cond_init(&gHs->gcThreadCond, NULL);
+    dvmInitCondForTimedWait(&gHs->gcThreadCond);
     gHs->gcThreadShutdown = false;
     gHs->hasGcThread = dvmCreateInternalThread(&gHs->gcThread, "GC",
                                                gcDaemonThread, NULL);
@@ -1537,9 +1535,11 @@ static void trimHeaps()
     }
 
     /* Same for the native heap. */
-    dlmalloc_trim(0);
     size_t nativeBytes = 0;
+#ifdef USE_DLMALLOC
+    dlmalloc_trim(0);
     dlmalloc_inspect_all(releasePagesInRange, &nativeBytes);
+#endif
 
     LOGD_HEAP("madvised %zd (GC) + %zd (native) = %zd total bytes",
             heapBytes, nativeBytes, heapBytes + nativeBytes);

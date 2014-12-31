@@ -129,7 +129,7 @@ bool dvmCompilerWorkEnqueue(const u2 *pc, WorkOrderKind kind, void* info)
     newOrder->pc = pc;
     newOrder->kind = kind;
     newOrder->info = info;
-    newOrder->result.methodCompilationAborted = NULL;
+    newOrder->result.methodCompilationAborted = false;
     newOrder->result.codeAddress = NULL;
     newOrder->result.discardResult =
         (kind == kWorkOrderTraceDebug) ? true : false;
@@ -212,7 +212,7 @@ bool dvmCompilerSetupCodeCache(void)
 
     /* Only flush the part in the code cache that is being used now */
     dvmCompilerCacheFlush((intptr_t) gDvmJit.codeCache,
-                          (intptr_t) gDvmJit.codeCache + templateSize, 0);
+                          (intptr_t) gDvmJit.codeCache + templateSize);
 #else
     gDvmJit.codeCacheByteUsed = 0;
     stream = (char*)gDvmJit.codeCache + gDvmJit.codeCacheByteUsed;
@@ -332,8 +332,7 @@ static void resetCodeCache(void)
                           gDvmJit.codeCacheByteUsed - gDvmJit.templateSize);
 
     dvmCompilerCacheFlush((intptr_t) gDvmJit.codeCache,
-                          (intptr_t) gDvmJit.codeCache +
-                          gDvmJit.codeCacheByteUsed, 0);
+                          (intptr_t) gDvmJit.codeCache + gDvmJit.codeCacheByteUsed);
 
     PROTECT_CODE_CACHE(gDvmJit.codeCache, gDvmJit.codeCacheByteUsed);
 
@@ -754,8 +753,8 @@ bool dvmCompilerStartup(void)
     dvmInitMutex(&gDvmJit.compilerICPatchLock);
     dvmInitMutex(&gDvmJit.codeCacheProtectionLock);
     dvmLockMutex(&gDvmJit.compilerLock);
-    pthread_cond_init(&gDvmJit.compilerQueueActivity, NULL);
-    pthread_cond_init(&gDvmJit.compilerQueueEmpty, NULL);
+    dvmInitCondForTimedWait(&gDvmJit.compilerQueueActivity);
+    dvmInitCondForTimedWait(&gDvmJit.compilerQueueEmpty);
 
     /* Reset the work queue */
     gDvmJit.compilerWorkEnqueueIndex = gDvmJit.compilerWorkDequeueIndex = 0;

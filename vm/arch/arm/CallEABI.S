@@ -254,12 +254,7 @@ DBG strcs   ip, [r8]                    @ DEBUG DEBUG
     ldmia   r9, {r2-r3}                 @ r2/r3<- argv[0]/argv[1]
 
     ldr     ip, [fp, #8+FP_ADJ]         @ ip<- func
-#ifdef __ARM_HAVE_BLX
     blx     ip                          @ call func
-#else
-    mov     lr, pc                      @ call func the old-fashioned way
-    bx      ip
-#endif
 
     @ We're back, result is in r0 or (for long/double) r0-r1.
     @
@@ -279,12 +274,7 @@ DBG strcs   ip, [r8]                    @ DEBUG DEBUG
 
     @ Restore the registers we saved and return.  On >= ARMv5TE we can
     @ restore PC directly from the saved LR.
-#ifdef __ARM_HAVE_PC_INTERWORK
     ldmfd   sp!, {r6, r7, r8, r9, fp, pc}
-#else
-    ldmfd   sp!, {r6, r7, r8, r9, fp, lr}
-    bx      lr
-#endif
 
 
 
@@ -417,12 +407,7 @@ common_squeak\num:
     ldr     r0, strSqueak
     mov     r1, #\num
     bl      printf
-#ifdef __ARM_HAVE_PC_INTERWORK
     ldmfd   sp!, {r0, r1, r2, r3, ip, pc}
-#else
-    ldmfd   sp!, {r0, r1, r2, r3, ip, lr}
-    bx      lr
-#endif
     .endm
 
     SQUEAK  0

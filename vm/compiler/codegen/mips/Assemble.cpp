@@ -73,6 +73,7 @@
  *     n -> complimented Thumb2 modified immediate
  *     M -> Thumb2 16-bit zero-extended immediate
  *     b -> 4-digit binary
+ *     B -> sync option string (SY, WMB, MB, ACQUIRE, RELEASE, RMB)
  *
  *  [!] escape.  To insert "!", use "!!"
  */
@@ -294,6 +295,10 @@ MipsEncodingMap EncodingMap[kMipsLast] = {
                  kFmtBitBlt, 20, 16, kFmtBitBlt, 15, 0, kFmtBitBlt, 25, 21,
                  kFmtUnused, -1, -1, IS_TERTIARY_OP | REG_USE02 | IS_STORE,
                  "sw", "!0r,!1d(!2r)", 2),
+    ENCODING_MAP(kMipsSync, 0x0000000F,
+                 kFmtBitBlt, 10, 6, kFmtUnused, -1, -1, kFmtUnused, -1, -1,
+                 kFmtUnused, -1, -1, IS_UNARY_OP,
+                 "sync", "!0B", 2),
     ENCODING_MAP(kMipsXor, 0x00000026,
                  kFmtBitBlt, 15, 11, kFmtBitBlt, 25, 21, kFmtBitBlt, 20, 16,
                  kFmtUnused, -1, -1, IS_TERTIARY_OP | REG_DEF0_USE12,
@@ -908,7 +913,7 @@ void dvmCompilerAssembleLIR(CompilationUnit *cUnit, JitTranslationInfo *info)
 
     /* Flush dcache and invalidate the icache to maintain coherence */
     dvmCompilerCacheFlush((long)cUnit->baseAddr,
-                          (long)((char *) cUnit->baseAddr + offset), 0);
+                          (long)((char *) cUnit->baseAddr + offset));
 
     UPDATE_CODE_CACHE_PATCHES();
 
@@ -969,7 +974,7 @@ void* dvmJitChain(void* tgtAddr, u4* branchAddr)
         UNPROTECT_CODE_CACHE(branchAddr, sizeof(*branchAddr));
 
         *branchAddr = newInst;
-        dvmCompilerCacheFlush((long)branchAddr, (long)branchAddr + 4, 0);
+        dvmCompilerCacheFlush((long)branchAddr, (long)branchAddr + 4);
         UPDATE_CODE_CACHE_PATCHES();
 
         PROTECT_CODE_CACHE(branchAddr, sizeof(*branchAddr));
@@ -1010,7 +1015,7 @@ static void inlineCachePatchEnqueue(PredictedChainingCell *cellAddr,
          */
         android_atomic_release_store((int32_t)newContent->clazz,
             (volatile int32_t *)(void*) &cellAddr->clazz);
-        dvmCompilerCacheFlush((long) cellAddr, (long) (cellAddr+1), 0);
+        dvmCompilerCacheFlush((long) cellAddr, (long) (cellAddr+1));
         UPDATE_CODE_CACHE_PATCHES();
 
         PROTECT_CODE_CACHE(cellAddr, sizeof(*cellAddr));
@@ -1221,7 +1226,7 @@ void dvmCompilerPatchInlineCache(void)
     }
 
     /* Then synchronize the I/D cache */
-    dvmCompilerCacheFlush((long) minAddr, (long) (maxAddr+1), 0);
+    dvmCompilerCacheFlush((long) minAddr, (long) (maxAddr+1));
     UPDATE_CODE_CACHE_PATCHES();
 
     PROTECT_CODE_CACHE(gDvmJit.codeCache, gDvmJit.codeCacheByteUsed);
@@ -1348,7 +1353,7 @@ void dvmJitUnchainAll()
         }
 
         if (lowAddress && highAddress)
-            dvmCompilerCacheFlush((long)lowAddress, (long)highAddress, 0);
+            dvmCompilerCacheFlush((long)lowAddress, (long)highAddress);
 
         UPDATE_CODE_CACHE_PATCHES();
 

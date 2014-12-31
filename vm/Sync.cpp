@@ -550,9 +550,11 @@ static void absoluteTime(s8 msec, s4 nsec, struct timespec *ts)
 {
     s8 endSec;
 
-#ifdef HAVE_TIMEDWAIT_MONOTONIC
+    // Clock used here must be consistent with clock specified in dvmInitCondForTimedWait
+#ifdef HAVE_POSIX_CLOCKS
     clock_gettime(CLOCK_MONOTONIC, ts);
 #else
+    // Platform (probably MacOS) doesn't support CLOCK_MONOTONIC
     {
         struct timeval tv;
         gettimeofday(&tv, NULL);
@@ -575,17 +577,26 @@ static void absoluteTime(s8 msec, s4 nsec, struct timespec *ts)
     }
 }
 
+void dvmInitCondForTimedWait(pthread_cond_t* cond)
+{
+    // Must be consistent with clock specified in absoluteTime
+#ifdef HAVE_POSIX_CLOCKS
+    pthread_condattr_t condAttr;
+    pthread_condattr_init(&condAttr);
+    pthread_condattr_setclock(&condAttr, CLOCK_MONOTONIC);
+    pthread_cond_init(cond, &condAttr);
+#else
+    // Platform (probably MacOS) doesn't support CLOCK_MONOTONIC or pthread_condattr_setclock
+    pthread_cond_init(cond, NULL);
+#endif
+}
+
 int dvmRelativeCondWait(pthread_cond_t* cond, pthread_mutex_t* mutex,
                         s8 msec, s4 nsec)
 {
-    int ret;
     struct timespec ts;
     absoluteTime(msec, nsec, &ts);
-#if defined(HAVE_TIMEDWAIT_MONOTONIC)
-    ret = pthread_cond_timedwait_monotonic(cond, mutex, &ts);
-#else
-    ret = pthread_cond_timedwait(cond, mutex, &ts);
-#endif
+    int ret = pthread_cond_timedwait(cond, mutex, &ts);
     assert(ret == 0 || ret == ETIMEDOUT);
     return ret;
 }
@@ -645,6 +656,7 @@ static void waitMonitor(Thread* self, Monitor* mon, s8 msec, s4 nsec,
     if (msec == 0 && nsec == 0) {
         timed = false;
     } else {
+        // Calculate absolute time before doing any other work so it is as accurate as possible.
         absoluteTime(msec, nsec, &ts);
         timed = true;
     }
@@ -710,11 +722,7 @@ static void waitMonitor(Thread* self, Monitor* mon, s8 msec, s4 nsec,
         ret = pthread_cond_wait(&self->waitCond, &self->waitMutex);
         assert(ret == 0);
     } else {
-#ifdef HAVE_TIMEDWAIT_MONOTONIC
-        ret = pthread_cond_timedwait_monotonic(&self->waitCond, &self->waitMutex, &ts);
-#else
         ret = pthread_cond_timedwait(&self->waitCond, &self->waitMutex, &ts);
-#endif
         assert(ret == 0 || ret == ETIMEDOUT);
     }
     if (self->interrupted) {
